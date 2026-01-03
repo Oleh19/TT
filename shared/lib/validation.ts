@@ -12,14 +12,6 @@ export function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
 }
 
-export function isValidTaskKey(key: string): boolean {
-  return (
-    /^[A-Z0-9-_]+$/.test(key) &&
-    key.length >= 1 &&
-    key.length <= VALIDATION_LIMITS.TASK_KEY_MAX_LENGTH
-  )
-}
-
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)

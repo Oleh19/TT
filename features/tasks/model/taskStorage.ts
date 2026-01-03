@@ -106,7 +106,7 @@ export async function deleteTask(
   id: string
 ): Promise<{ success: boolean; task: Task | null }> {
   const tasks = await getTasks()
-  const task = tasks.find(t => t.id === id)
+  const task = tasks.find(t => t.id === id) || mockTasks.find(t => t.id === id)
 
   if (!task) {
     return { success: false, task: null }
@@ -116,8 +116,12 @@ export async function deleteTask(
     return { success: false, task }
   }
 
-  const updatedTasks = tasks.filter(task => task.id !== id)
-  await saveTasks(updatedTasks)
+  const taskInFile = tasks.find(t => t.id === id)
+  if (taskInFile) {
+    const updatedTasks = tasks.filter(t => t.id !== id)
+    await saveTasks(updatedTasks)
+  }
+
   return { success: true, task: null }
 }
 
