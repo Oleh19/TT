@@ -47,8 +47,13 @@ export async function createTask(taskData: CreateTaskData): Promise<Task> {
     body: JSON.stringify(taskData),
   })
 
-  if (response.status === 409) {
-    throw new Error('Task with this key already exists')
+  if (!response.ok) {
+    const contentType = response.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json()
+      throw new Error(data.error || 'Failed to create task')
+    }
+    throw new Error('Failed to create task')
   }
 
   return handleResponse<Task>(response)
@@ -66,8 +71,13 @@ export async function updateTask(
     body: JSON.stringify(taskData),
   })
 
-  if (response.status === 409) {
-    throw new Error('Task with this key already exists')
+  if (!response.ok) {
+    const contentType = response.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json()
+      throw new Error(data.error || 'Failed to update task')
+    }
+    throw new Error('Failed to update task')
   }
 
   return handleResponse<Task>(response)

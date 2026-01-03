@@ -53,7 +53,9 @@ export async function getAllTasks(): Promise<Task[]> {
 
 export async function getTaskById(id: string): Promise<Task | undefined> {
   const tasks = await getTasks()
-  return tasks.find(task => task.id === id)
+  return (
+    tasks.find(task => task.id === id) || mockTasks.find(task => task.id === id)
+  )
 }
 
 export async function getTaskByKey(key: string): Promise<Task | undefined> {
@@ -84,16 +86,23 @@ export async function updateTask(
   updates: Partial<Omit<Task, 'id'>>
 ): Promise<Task | null> {
   const tasks = await getTasks()
-  const index = tasks.findIndex(task => task.id === id)
-  if (index === -1) {
-    return null
-  }
+  const allTasks = [
+    ...tasks,
+    ...mockTasks.filter(mt => !tasks.find(t => t.id === mt.id)),
+  ]
 
   if (updates.key !== undefined) {
-    const existingTask = tasks.find(t => t.key === updates.key && t.id !== id)
+    const existingTask = allTasks.find(
+      t => t.key === updates.key && t.id !== id
+    )
     if (existingTask) {
       throw new Error('Task with this key already exists')
     }
+  }
+
+  const index = tasks.findIndex(task => task.id === id)
+  if (index === -1) {
+    return null
   }
 
   const updatedTasks = [...tasks]

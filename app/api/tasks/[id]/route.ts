@@ -30,11 +30,6 @@ export async function PUT(
     const body = await request.json()
     const { name, key, description, status, labels } = body
 
-    const existingTask = await getTaskById(params.id)
-    if (!existingTask) {
-      throw new NotFoundError('Task')
-    }
-
     const updates: Partial<{
       name: string
       key: string
@@ -66,6 +61,10 @@ export async function PUT(
     const updatedTask = await updateTask(params.id, updates)
 
     if (!updatedTask) {
+      const existingTask = await getTaskById(params.id)
+      if (!existingTask) {
+        throw new NotFoundError('Task')
+      }
       return Response.json({ error: 'Failed to update task' }, { status: 500 })
     }
 
